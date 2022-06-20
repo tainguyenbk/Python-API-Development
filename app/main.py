@@ -1,3 +1,4 @@
+from turtle import title
 from fastapi import Depends, FastAPI, Response, status, HTTPException
 from pydantic import BaseModel
 import psycopg2
@@ -44,24 +45,30 @@ def find_index_post(id):
 def root():
     return {"message": "Hello World"}
 
-@app.route("/sqlalchemy")
+@app.get("/sqlalchemy")
 def test_posts(db: Session = Depends(get_db)):
-    return {"status": "successfully"}
+    posts = db.query(models.Post)
+    print(posts)
+    return {"data": "successful"}
 
 
 @app.get("/posts")
-def get_posts():
-    cursor.execute("""SELECT * FROM posts""")
-    posts = cursor.fetchall()
-    print(posts)
-    return {"data": my_posts}
+def get_posts(db: Session = Depends(get_db)):
+    # cursor.execute("""SELECT * FROM posts""")
+    # posts = cursor.fetchall()
+    posts = db.query(models.Post).all()
+    return {"data": posts}
 
 @app.post("/posts", status_code=status.HTTP_201_CREATED)
-def create_posts(post: Post):
-    cursor.execute("""INSERT INTO posts (title, content, published) VALUES (%s, %s, %s) RETURNING *""", 
-                (post.title, post.content, post.published))
-    new_post = cursor.fetchone()
-    conn.commit()
+def create_posts(post: Post, db: Session = Depends(get_db)):
+    # cursor.execute("""INSERT INTO posts (title, content, published) VALUES (%s, %s, %s) RETURNING *""", 
+    #             (post.title, post.content, post.published))
+    # new_post = cursor.fetchone()
+    # conn.commit()
+    new_post = models.Post(**post.dict())
+    db.add(new_post)
+    db.commit()
+    db.refresh(new_post)
     return {"data": new_post}
 
 @app.get("posts/latest")
