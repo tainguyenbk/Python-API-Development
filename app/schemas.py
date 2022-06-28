@@ -14,10 +14,8 @@ class PostCreate(PostBase):
 
 class Post(BaseModel):
     id: int
-    title: str
-    content: str
-    published: bool
     created_at: datetime
+    owner_id: int
 
     class Config:
         orm_mode = True
