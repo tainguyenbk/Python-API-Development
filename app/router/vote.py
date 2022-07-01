@@ -1,3 +1,4 @@
+from asyncio import constants
 from fastapi import Depends, status, HTTPException, APIRouter
 from .. import schemas, database, models, oauth2
 from sqlalchemy.orm import Session
@@ -26,7 +27,7 @@ def create_user(vote: schemas.Vote, db: Session = Depends(database.get_db), curr
 
         return {"message": "successfully added vote"}
     else:
-        if not found_vote:
+        if not found_vote: 
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Vote does not exist")
 
         vote_query.delete(synchronize_session=False)

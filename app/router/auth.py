@@ -20,7 +20,6 @@ def login(user_credentials: schemas.UserLogin, db: Session = Depends(database.ge
             status_code=status.HTTP_403_FORBIDDEN, detail=f"Invalid Credentials")
     
     #create a token
-
     access_token = oauth2.create_access_token(data={"user_id": user.id})
 
     #return token
